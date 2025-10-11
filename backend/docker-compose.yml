@@ -1,0 +1,40 @@
+services:
+  social_backend:
+    container_name: social_backend
+    image: social/backend:0.0.0
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - social_postgres
+    networks:
+      - social_network
+  social_postgres:
+    container_name: social_postgres
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - social_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - social_network
+
+volumes:
+  social_postgres_data: {}
+
+networks:
+  social_network:
+    driver: bridge
