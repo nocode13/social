@@ -23,6 +23,7 @@ export const $sessionStatus = createStore<Session>('initial')
   .on([fetchSessionFx.fail, loggedOut], () => 'unauthorized');
 
 const setTokenToStorageFx = createEffect(authStorageService.setToken);
+const removeTokenFromStorageFx = createEffect(authStorageService.removeToken);
 
 sample({
   clock: Gate.open,
@@ -41,4 +42,9 @@ sample({
   clock: authPassed,
   fn: (response) => response.data.authorization.token,
   target: setTokenToStorageFx,
+});
+
+sample({
+  clock: loggedOut,
+  target: removeTokenFromStorageFx,
 });

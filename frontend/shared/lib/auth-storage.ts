@@ -18,6 +18,14 @@ class AuthStorage {
 
     return SecureStore.setItem(ACCESS_TOKEN, token);
   }
+
+  public removeToken() {
+    if (Platform.OS === 'web') {
+      return window.localStorage.removeItem(ACCESS_TOKEN);
+    }
+
+    return SecureStore.deleteItemAsync(ACCESS_TOKEN);
+  }
 }
 
 export const authStorageService = new AuthStorage();
