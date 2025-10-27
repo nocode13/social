@@ -1,0 +1,17 @@
+{
+  "prettier.prettierPath": "./frontend/node_modules/prettier",
+  "prettier.configPath": "./frontend/.prettierrc",
+  "prettier.documentSelectors": ["**/*.{js,jsx,ts,tsx}"],
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

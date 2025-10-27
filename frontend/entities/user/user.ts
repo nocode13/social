@@ -1,0 +1,44 @@
+import { api } from '@/shared/api';
+import { LoginAndSignupRes } from '@/shared/api/dtos';
+import { User } from '@/shared/api/types';
+import { authStorageService } from '@/shared/lib/auth-storage';
+import { AxiosResponse } from 'axios';
+import { createEffect, createEvent, createStore, sample } from 'effector';
+import { createGate } from 'effector-react';
+
+type Session = 'initial' | 'pending' | 'authorized' | 'unauthorized';
+
+export const authPassed = createEvent<AxiosResponse<LoginAndSignupRes>>();
+export const loggedOut = createEvent();
+
+export const Gate = createGate();
+
+export const $user = createStore<User | null>(null).reset(loggedOut);
+
+const fetchSessionFx = createEffect(() => api.user.getMe());
+
+export const $sessionStatus = createStore<Session>('initial')
+  .on(fetchSessionFx, () => 'pending')
+  .on([fetchSessionFx.done, authPassed], () => 'authorized')
+  .on([fetchSessionFx.fail, loggedOut], () => 'unauthorized');
+
+const setTokenToStorageFx = createEffect(authStorageService.setToken);
+
+sample({
+  clock: Gate.open,
+  source: $sessionStatus,
+  filter: (sessionStatus) => sessionStatus === 'initial',
+  target: fetchSessionFx,
+});
+
+sample({
+  clock: [fetchSessionFx.doneData, authPassed],
+  fn: (response) => response.data.user,
+  target: $user,
+});
+
+sample({
+  clock: authPassed,
+  fn: (response) => response.data.authorization.token,
+  target: setTokenToStorageFx,
+});
