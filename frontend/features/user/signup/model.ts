@@ -1,7 +1,7 @@
 import { createEffect, sample } from 'effector';
 
 import { api } from '@/shared/api';
-import userModel from '@/entities/user';
+import { userModel } from '@/entities/user';
 
 export const signupFx = createEffect(api.auth.signup);
 export const $pending = signupFx.pending;

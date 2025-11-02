@@ -4,7 +4,7 @@ import { VStack } from '@/components/ui/vstack';
 import { LogOut } from 'lucide-react-native';
 import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import userModel from '@/entities/user';
+import { userModel } from '@/entities/user';
 
 export const SettingsPage: React.FC = () => {
   return (

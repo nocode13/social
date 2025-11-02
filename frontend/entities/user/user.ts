@@ -9,6 +9,7 @@ import { createGate } from 'effector-react';
 type Session = 'initial' | 'pending' | 'authorized' | 'unauthorized';
 
 export const authPassed = createEvent<AxiosResponse<LoginAndSignupRes>>();
+export const authorized = createEvent();
 export const loggedOut = createEvent();
 
 export const Gate = createGate();
@@ -34,17 +35,24 @@ sample({
 
 sample({
   clock: [fetchSessionFx.doneData, authPassed],
-  fn: (response) => response.data.user,
+  fn: (response) =>
+    'user' in response.data.data ? response.data.data.user : response.data.data,
   target: $user,
 });
 
 sample({
   clock: authPassed,
-  fn: (response) => response.data.authorization.token,
+  fn: (response) => response.data.data.authorization.token,
   target: setTokenToStorageFx,
 });
 
 sample({
   clock: loggedOut,
   target: removeTokenFromStorageFx,
+});
+
+sample({
+  clock: $sessionStatus,
+  filter: (status) => status === 'authorized',
+  target: authorized,
 });
