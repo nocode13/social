@@ -6,6 +6,7 @@ import {
   MailIcon,
   LockIcon,
   UserIcon,
+  PawPrint,
 } from 'lucide-react-native';
 import { Link as RouterLink } from 'expo-router';
 
@@ -15,7 +16,13 @@ import { VStack } from '@/components/ui/vstack';
 import { Heading } from '@/components/ui/heading';
 import { Link, LinkText } from '@/components/ui/link';
 import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
+import {
+  FormControl,
+  FormControlLabel,
+  FormControlLabelText,
+  FormControlError,
+  FormControlErrorText,
+} from '@/components/ui/form-control';
 import { validateEmail, validatePassword } from '@/shared/lib/validate';
 
 import * as model from './model';
@@ -24,6 +31,7 @@ import { useUnit } from 'effector-react';
 type FormState = {
   name: string;
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
   showPassword: boolean;
@@ -31,12 +39,14 @@ type FormState = {
   errors: {
     name?: string;
     email?: string;
+    username?: string;
     password?: string;
     confirmPassword?: string;
   };
   touched: {
     name: boolean;
     email: boolean;
+    username?: boolean;
     password: boolean;
     confirmPassword: boolean;
   };
@@ -45,6 +55,7 @@ type FormState = {
 type FormAction =
   | { type: 'SET_NAME'; payload: string }
   | { type: 'SET_EMAIL'; payload: string }
+  | { type: 'SET_USERNAME'; payload: string }
   | { type: 'SET_PASSWORD'; payload: string }
   | { type: 'SET_CONFIRM_PASSWORD'; payload: string }
   | { type: 'TOGGLE_PASSWORD_VISIBILITY' }
@@ -57,6 +68,7 @@ type FormAction =
 const initialState: FormState = {
   name: '',
   email: '',
+  username: '',
   password: '',
   confirmPassword: '',
   showPassword: false,
@@ -65,6 +77,7 @@ const initialState: FormState = {
   touched: {
     name: false,
     email: false,
+    username: false,
     password: false,
     confirmPassword: false,
   },
@@ -94,6 +107,19 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           email:
             state.touched.email && action.payload
               ? validateEmail(action.payload)
+              : undefined,
+        },
+      };
+
+    case 'SET_USERNAME':
+      return {
+        ...state,
+        username: action.payload,
+        errors: {
+          ...state.errors,
+          username:
+            state.touched.username && !action.payload.trim()
+              ? 'username is required'
               : undefined,
         },
       };
@@ -213,6 +239,7 @@ export const SignupForm: React.FC = () => {
     model.signupFx({
       name: state.name,
       email: state.email,
+      username: state.username,
       password: state.password,
     });
   };
@@ -224,12 +251,14 @@ export const SignupForm: React.FC = () => {
       </Heading>
 
       <VStack space="lg">
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={state.touched.name && !!state.errors.name}
-          >
+        <FormControl
+          size="md"
+          isInvalid={state.touched.name && !!state.errors.name}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Name</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={UserIcon} width={16} height={16} />
             </InputSlot>
@@ -241,19 +270,19 @@ export const SignupForm: React.FC = () => {
               autoCapitalize="none"
             />
           </Input>
-          {state.touched.name && state.errors.name && (
-            <Text size="sm" style={styles.errorText}>
-              {state.errors.name}
-            </Text>
-          )}
-        </VStack>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.name}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
 
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={state.touched.email && !!state.errors.email}
-          >
+        <FormControl
+          size="md"
+          isInvalid={state.touched.email && !!state.errors.email}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Email</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={MailIcon} width={16} height={16} />
             </InputSlot>
@@ -268,19 +297,47 @@ export const SignupForm: React.FC = () => {
               autoCapitalize="none"
             />
           </Input>
-          {state.touched.email && state.errors.email && (
-            <Text size="sm" style={styles.errorText}>
-              {state.errors.email}
-            </Text>
-          )}
-        </VStack>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.email}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
 
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={state.touched.password && !!state.errors.password}
-          >
+        <FormControl
+          size="md"
+          isInvalid={state.touched.username && !!state.errors.username}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Username</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
+            <InputSlot style={styles.iconSlot}>
+              <InputIcon as={PawPrint} width={16} height={16} />
+            </InputSlot>
+            <InputField
+              placeholder="Username"
+              value={state.username}
+              onChangeText={(v) =>
+                dispatch({ type: 'SET_USERNAME', payload: v })
+              }
+              onBlur={() =>
+                dispatch({ type: 'VALIDATE_FIELD', field: 'username' })
+              }
+              autoCapitalize="none"
+            />
+          </Input>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.username}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl
+          size="md"
+          isInvalid={state.touched.password && !!state.errors.password}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Password</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={LockIcon} width={16} height={16} />
             </InputSlot>
@@ -307,21 +364,21 @@ export const SignupForm: React.FC = () => {
               />
             </InputSlot>
           </Input>
-          {state.touched.password && state.errors.password && (
-            <Text size="sm" style={styles.errorText}>
-              {state.errors.password}
-            </Text>
-          )}
-        </VStack>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.password}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
 
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={
-              state.touched.confirmPassword && !!state.errors.confirmPassword
-            }
-          >
+        <FormControl
+          size="md"
+          isInvalid={
+            state.touched.confirmPassword && !!state.errors.confirmPassword
+          }
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Confirm Password</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={LockIcon} width={16} height={16} />
             </InputSlot>
@@ -350,12 +407,12 @@ export const SignupForm: React.FC = () => {
               />
             </InputSlot>
           </Input>
-          {state.touched.confirmPassword && state.errors.confirmPassword && (
-            <Text size="sm" style={styles.errorText}>
+          <FormControlError>
+            <FormControlErrorText>
               {state.errors.confirmPassword}
-            </Text>
-          )}
-        </VStack>
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
       </VStack>
 
       <Button size="lg" onPress={handleSignup} isDisabled={pending}>
@@ -389,5 +446,4 @@ const styles = StyleSheet.create({
   },
   iconSlot: { paddingLeft: 12 },
   eyeSlot: { paddingRight: 12 },
-  errorText: { color: '#ef4444', marginTop: 4 },
 });

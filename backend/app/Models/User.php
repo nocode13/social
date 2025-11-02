@@ -13,6 +13,16 @@ class User extends Authenticatable implements JWTSubject // ← ДОБАВЬТЕ
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    public function chats()
+    {
+        return $this->belongsToMany(
+            Chat::class,
+            'chat_participants',
+            'user_id',
+            'chat_id'
+        )->withTimestamps();
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +32,7 @@ class User extends Authenticatable implements JWTSubject // ← ДОБАВЬТЕ
         'name',
         'email',
         'password',
+        'username'
     ];
 
     /**

@@ -22,6 +22,12 @@ export default function AppLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="[id]"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

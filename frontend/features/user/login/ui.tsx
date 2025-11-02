@@ -9,7 +9,13 @@ import { VStack } from '@/components/ui/vstack';
 import { Heading } from '@/components/ui/heading';
 import { Link, LinkText } from '@/components/ui/link';
 import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
+import {
+  FormControl,
+  FormControlLabel,
+  FormControlLabelText,
+  FormControlError,
+  FormControlErrorText,
+} from '@/components/ui/form-control';
 import { validateEmail, validatePassword } from '@/shared/lib/validate';
 
 import * as model from './model';
@@ -176,12 +182,14 @@ export const LoginForm: React.FC = () => {
       </Heading>
 
       <VStack space="lg">
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={state.touched.email && !!state.errors.email}
-          >
+        <FormControl
+          size="md"
+          isInvalid={state.touched.email && !!state.errors.email}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Email</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={MailIcon} width={16} height={16} />
             </InputSlot>
@@ -194,19 +202,19 @@ export const LoginForm: React.FC = () => {
               autoCapitalize="none"
             />
           </Input>
-          {state.touched.email && state.errors.email && (
-            <Text size="sm" style={styles.errorText}>
-              {state.errors.email}
-            </Text>
-          )}
-        </VStack>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.email}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
 
-        <VStack space="xs">
-          <Input
-            variant="outline"
-            size="md"
-            isInvalid={state.touched.password && !!state.errors.password}
-          >
+        <FormControl
+          size="md"
+          isInvalid={state.touched.password && !!state.errors.password}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Password</FormControlLabelText>
+          </FormControlLabel>
+          <Input variant="outline" size="md">
             <InputSlot style={styles.iconSlot}>
               <InputIcon as={LockIcon} width={16} height={16} />
             </InputSlot>
@@ -229,12 +237,10 @@ export const LoginForm: React.FC = () => {
               />
             </InputSlot>
           </Input>
-          {state.touched.password && state.errors.password && (
-            <Text size="sm" style={styles.errorText}>
-              {state.errors.password}
-            </Text>
-          )}
-        </VStack>
+          <FormControlError>
+            <FormControlErrorText>{state.errors.password}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
       </VStack>
 
       <Button size="lg" onPress={handleLogin} isDisabled={pending}>
@@ -271,9 +277,5 @@ const styles = StyleSheet.create({
   },
   eyeSlot: {
     paddingRight: 12,
-  },
-  errorText: {
-    color: '#ef4444',
-    marginTop: 4,
   },
 });

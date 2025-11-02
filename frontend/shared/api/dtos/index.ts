@@ -1,10 +1,7 @@
-import { User } from '../types';
+import { ShortChat, User } from '../types';
+import { ApiResponse, ApiResponseWithPagination } from './common';
 
-export type GetMeRes = {
-  status: string;
-  user: User;
-};
-
+export type GetMeRes = ApiResponse<User>;
 export type LoginBody = {
   email: string;
   password: string;
@@ -12,15 +9,17 @@ export type LoginBody = {
 
 export type SignupBody = {
   email: string;
+  username: string;
   password: string;
   name: string;
 };
 
-export type LoginAndSignupRes = {
-  status: string;
+export type LoginAndSignupRes = ApiResponse<{
   user: User;
   authorization: {
     token: string;
     type: string;
   };
-};
+}>;
+
+export type FindAllChatsRes = ApiResponseWithPagination<ShortChat[]>;
